@@ -1,0 +1,14 @@
+.menu-base-icon{
+    color: white;
+}
+
+app-header {
+    margin-right: 20px;
+}
+
+.label-nome {
+    width: 65%;
+    text-align: center;
+    color: white;
+    font-size: 30px;
+}

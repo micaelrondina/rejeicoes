@@ -1,0 +1,74 @@
+<div fxLayout="row" fxLayoutWrap="wrap">
+    <div fxFlex.gt-sm="100%" fxFlex="100" class="tela-filtro-grid-padrao">
+
+        <mat-card class="mat-card-filtro-batimento">
+            <mat-card-content>
+                <mat-card-title class="lbl-title">Consultar Código de Retorno das Transações Enviadas ao Payware</mat-card-title>
+                <form [formGroup]="formSearch" (ngSubmit)="onSubmitSearch()">
+                    <div class="row">
+                        <div class="lbl-data">
+                            <mat-label>Data Envio PAYware: </mat-label>
+                        </div>
+                        <div class="col-md-3">
+                            <mat-form-field>
+                                <input matInput [matDatepicker]="dataMov" placeholder="Selecione Data Movimento" formControlName="dataMov" readonly (dateChange)="changeDatMovi()">
+                                <mat-datepicker-toggle matSuffix [for]="dataMov"></mat-datepicker-toggle>
+                                <mat-datepicker #dataMov disabled="false"></mat-datepicker>
+                                <mat-error *ngIf="formSearch.get('dataMov').invalid">{{getRequiredMessage('dataMov')}}
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="mt10" type="submit" mat-raised-button color="primary"><i class="material-icons">search</i>Consultar</button>
+                        </div>
+                    </div>
+                </form>
+            </mat-card-content>
+        </mat-card>
+
+        <mat-card class="mat-card-grid-batimento">
+            <div class="grid-container-batimento">
+                <table mat-table [dataSource]="listRetorno" class="tabela-padrao">
+
+                    <ng-container matColumnDef="DATA_MOV">
+                        <th mat-header-cell *matHeaderCellDef style="min-width: 80px"> Data Mov. </th>
+                        <td mat-cell *matCellDef="let element"> {{element.dataMovFormatada}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="NR_REF_TRANSACAO">
+                        <th mat-header-cell *matHeaderCellDef style="min-width: 120px"> Nº Ref. Transação </th>
+                        <td mat-cell *matCellDef="let element"> {{element.numRefTransacao}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="NR_PARCELA"> 
+                        <th mat-header-cell *matHeaderCellDef style="min-width: 60px; text-align: left; padding-right: 10px;"> Parcelas </th>
+                        <td mat-cell *matCellDef="let element" style="text-align: left;">{{element.numParcela}}/{{element.qtdTotParcelas}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="VALOR_VENDA">
+                        <th mat-header-cell *matHeaderCellDef style="min-width: 70px; text-align: left; padding-right: 10px;"> Valor <br /> Venda </th>
+                        <td mat-cell *matCellDef="let element" style="text-align: left;"> {{element.valorVenda.toLocaleString('pt-br', {minimumFractionDigits: 2})}} </td>
+                    </ng-container>                     
+
+                    <ng-container matColumnDef="DH_ENVIO_ARQ_PAYWARE">
+                        <th mat-header-cell *matHeaderCellDef style="min-width: 80px"> Data/Hora <br /> Envio Arq. Payware </th>
+                        <td mat-cell *matCellDef="let element"> {{element.dhEnvioArqPayware | date:'dd/MM/yyyy HH:mm:ss'}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="RETURN_CODE_PAYWARE">
+                        <th mat-header-cell *matHeaderCellDef style="min-width: 70px"> Código <br /> Retorno do Payware </th>
+                        <td mat-cell *matCellDef="let element"> {{element.returnCodePayware}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="RETURN_DESCRIPTION_PAYWARE">
+                        <th mat-header-cell *matHeaderCellDef style="min-width: 200px"> Descrição Retorno do Payware </th>
+                        <td mat-cell *matCellDef="let element"> {{element.returnDescriptionPayware}} </td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                </table>
+            </div>
+        </mat-card>
+    </div>
+</div>

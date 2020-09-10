@@ -1,0 +1,24 @@
+.tabela-padrao tr.mat-row {
+    cursor: pointer;
+}
+
+.tabela-padrao tr.mat-row:hover {
+    background: #e8e3e3c7;
+}
+
+.periodo-de {
+    float: left;
+    display: block;
+    margin-top: 20px;
+    margin-left: 15px;
+}
+
+.perido-a {
+    float: left;
+    display: block;
+    margin-top: 20px;
+}
+
+.mt10 {
+    margin-top: 10px;
+}

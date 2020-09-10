@@ -1,0 +1,103 @@
+<div fxLayout="row" fxLayoutWrap="wrap">
+    <div fxFlex.gt-sm="100%" fxFlex="100" class="tela-filtro-grid-padrao">
+
+            <mat-card>
+                <mat-card-content class="mat-card-filtro" >
+                    <filtro-consulta [lblTitulo]="'Consulta Sintética'" (changeSearch)="resetPesquisa($event)"
+                        [exibirBtnExport]="exibirBtnExport" (onExport)="exportarGridExcel()"
+                        (objectFiltro)="receberObjetoFiltro($event)" [tipoConsulta]="'sintetica'" ></filtro-consulta>
+                </mat-card-content>
+            </mat-card>
+
+            <mat-card class="mat-card-grid">
+                <div class="grid-container">
+                    <table mat-table [dataSource]="listSintetico" class="tabela-padrao">
+    
+                        <!-- Outgoing -->
+                        <ng-container matColumnDef="DATA_OUTGOING">
+                            <th mat-header-cell *matHeaderCellDef style="min-width: 100px;"> Data </th>
+                            <td mat-cell *matCellDef="let element"> {{element.dataOutgoingFormatada}} </td>
+                        </ng-container>
+                        
+                        <ng-container matColumnDef="NOME_ARQ_OUTGOING">
+                            <th mat-header-cell *matHeaderCellDef style="min-width: 50px"> Arquivo </th>
+                            <td mat-cell class="tabela-id" *matCellDef="let element"> {{element.nomeArqOutgoing}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="QTD_OUTGOING">
+                            <th mat-header-cell *matHeaderCellDef style="min-width: 50px; text-align: right;" > Qtd. </th>
+                            <td mat-cell *matCellDef="let element" style="text-align: right;"> {{element.qtdOutgoing}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="VLR_TOTAL_OUTGOING">
+                            <th mat-header-cell *matHeaderCellDef style="min-width: 100px; text-align: right; padding-right: 10px;"> Total </th>
+                            <td mat-cell *matCellDef="let element" style="text-align: right; padding-right: 10px;"> {{formataValor(element.valorTotalOutgoing)}} </td>
+                        </ng-container>
+
+                        <!-- Incoming ELO -->
+                        <ng-container matColumnDef="DATA_RET_INCOMING_PARC">
+                            <th mat-header-cell *matHeaderCellDef style="min-width: 100px" class="separa-grupos-colunas"> Data Retorno </th>
+                            <td mat-cell *matCellDef="let element" class="separa-grupos-colunas" [ngClass]="{'lbl-rej-total': element.rejTotal == 1}">{{checkRejTotal(element.dataRetornoIncomingParcialFormatada, element.rejTotal)}}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="QTD_INCOMING_PARC">
+                            <th mat-header-cell *matHeaderCellDef style="min-width: 50px; text-align: right;" > Qtd. </th>
+                            <td mat-cell *matCellDef="let element" style="text-align: right;" [ngClass]="{'lbl-rej-total': element.rejTotal == 1}"> {{checkRejTotal(mostraQuantidade(element.dataRetornoIncomingParcialFormatada, element.qtdIncomingParcial), element.rejTotal)}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="VLR_INCOMING_PARC">
+                            <th mat-header-cell *matHeaderCellDef style="min-width: 100px; text-align: right; padding-right: 10px;"> Total </th>
+                            <td mat-cell *matCellDef="let element" style="text-align: right; padding-right: 10px;" [ngClass]="{'lbl-rej-total': element.rejTotal == 1}"> {{checkRejTotal(formataValor(element.valorIncomingParcial), element.rejTotal)}} </td>
+                        </ng-container>
+
+                        <!-- Incoming Emissor -->
+                        <ng-container matColumnDef="DATA_RET_INCOMING_TOT">
+                            <th mat-header-cell *matHeaderCellDef style="min-width: 90px" class="separa-grupos-colunas"> Data Retorno </th>
+                            <td mat-cell *matCellDef="let element" class="separa-grupos-colunas" [ngClass]="{'lbl-rej-total': element.rejTotal == 1}"> {{checkRejTotal(element.dataRetornoIncomingTotalFormatada, element.rejTotal)}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="QTD_INCOMING_TOT">
+                            <th mat-header-cell *matHeaderCellDef style="min-width: 50px; text-align: right;" > Qtd. </th>
+                            <td mat-cell *matCellDef="let element" style="text-align: right;" [ngClass]="{'lbl-rej-total': element.rejTotal == 1}"> {{checkRejTotal(mostraQuantidade(element.dataRetornoIncomingTotalFormatada, element.qtdIncomingTotal), element.rejTotal)}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="VLR_INCOMING_TOT">
+                            <th mat-header-cell *matHeaderCellDef style="min-width: 100px; text-align: right; padding-right: 10px;"> Total </th>
+                            <td mat-cell *matCellDef="let element" style="text-align: right; padding-right: 10px;" [ngClass]="{'lbl-rej-total': element.rejTotal == 1}"> {{checkRejTotal(formataValor(element.valorIncomingTotal), element.rejTotal)}} </td>
+                        </ng-container>
+                        
+                        <!-- Liquido -->
+                        <ng-container matColumnDef="QTD_LIQUIDO">
+                            <th mat-header-cell *matHeaderCellDef style="min-width: 50px; text-align: right;" class="separa-grupos-colunas" > Qtd. </th>
+                            <td mat-cell *matCellDef="let element" class="separa-grupos-colunas" style="text-align: right;" [ngClass]="{'lbl-rej-total': element.rejTotal == 1}"> {{element.rejTotal == 1 ? "-" : element.qtdLiquido}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="VLR_LIQUIDO">
+                            <th mat-header-cell *matHeaderCellDef style="min-width: 100px; text-align: right; padding-right: 10px;"> Total </th>
+                            <td mat-cell *matCellDef="let element" style="text-align: right; padding-right: 10px;" [ngClass]="{'lbl-rej-total': element.rejTotal == 1}"> {{element.rejTotal == 1 ? "-" : formataValor(element.valorLiquido)}} </td>
+                        </ng-container>
+
+                        <!-- Group Column --> // The header template for the GROUP!
+                        <ng-container matColumnDef="outgoing">
+                            <th mat-header-cell *matHeaderCellDef colspan="4"> Outgoing </th>
+                        </ng-container>
+                        <ng-container matColumnDef="incoming-parcial">
+                            <th mat-header-cell *matHeaderCellDef colspan="3" class="separa-grupos-colunas"> Incoming ELO </th>
+                        </ng-container>
+                        <ng-container matColumnDef="incoming-total">
+                            <th mat-header-cell *matHeaderCellDef colspan="3" class="separa-grupos-colunas"> Incoming Emissor </th>
+                        </ng-container>
+                        <ng-container matColumnDef="liquido">
+                            <th mat-header-cell *matHeaderCellDef colspan="2" class="separa-grupos-colunas"> Líquido </th>
+                        </ng-container>
+    
+                        <tr mat-header-row *matHeaderRowDef="['outgoing', 'incoming-parcial', 'incoming-total', 'liquido']"></tr>
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                    </table>
+                </div>
+            </mat-card>
+
+    </div>
+</div>

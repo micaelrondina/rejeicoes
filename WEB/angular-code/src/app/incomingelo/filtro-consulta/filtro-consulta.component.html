@@ -1,0 +1,93 @@
+<mat-card-title>{{lblTitulo}}</mat-card-title>
+<form [formGroup]="formSearch" (ngSubmit)="onSubmitSearch()">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-4">
+                <mat-form-field>
+                    <mat-select placeholder="Adquirente" formControlName="idAcquirer" (selectionChange)="changeParametros()">
+                        <mat-option *ngFor="let credenciador of listCredenciador" [value]="credenciador">
+                            {{credenciador.vlParametroAlfa}} - {{credenciador.dsParametro}}
+                        </mat-option>
+                    </mat-select>
+                    <mat-error *ngIf="formSearch.get('idAcquirer').invalid">{{getRequiredMessage('idAcquirer')}}</mat-error>
+                </mat-form-field>
+            </div>
+
+            <div class="col-md-3">
+                <mat-form-field>
+                    <mat-select placeholder="Produto" formControlName="idProduto" (selectionChange)="changeParametros()">
+                        <mat-option *ngFor="let prod of listProdutos" [value]="prod">
+                            {{prod.dsParametro}}
+                        </mat-option>
+                    </mat-select>
+                    <mat-error *ngIf="formSearch.get('idProduto').invalid">{{getRequiredMessage('idProduto')}}</mat-error>
+                </mat-form-field>
+            </div>
+
+            <div class="col-md-5" *ngIf="consultaAnalitica()">
+                <mat-form-field>
+                    <mat-select placeholder="Tipo Transação" formControlName="idTpTransacao" (selectionChange)="changeTpTransacao($event)">
+                        <mat-option *ngFor="let tpTransacao of listTpTransacao" [value]="tpTransacao">
+                            {{tpTransacao.vlParametroAlfa}} - {{tpTransacao.dsParametro}}
+                        </mat-option>
+                    </mat-select>
+                    <mat-error *ngIf="formSearch.get('idTpTransacao').invalid">{{getRequiredMessage('idTpTransacao')}}</mat-error>
+                </mat-form-field>
+            </div>
+
+        </div>
+        <div class="row">
+            <div class="periodo-de">
+                <mat-label>Período: de </mat-label>
+            </div>
+            <div class="col-md-3">
+                <mat-form-field>
+                    <input matInput [matDatepicker]="datePickerInicio" placeholder="Selecione Data Início"
+                        formControlName="dataInicio" readonly (dateChange)="changeParametros()">
+                    <mat-datepicker-toggle matSuffix [for]="datePickerInicio"></mat-datepicker-toggle>
+                    <mat-datepicker #datePickerInicio disabled="false"></mat-datepicker>
+                    <mat-error *ngIf="formSearch.get('dataInicio').invalid">{{getRequiredMessage('dataInicio')}}</mat-error>
+                </mat-form-field>
+            </div>
+            <div class="perido-a">
+                <mat-label> a</mat-label>
+            </div>
+            <div class="col-md-3">
+                <mat-form-field>
+                    <input matInput [matDatepicker]="datePickerFim" placeholder="Selecione Data Fim"
+                        formControlName="dataFim" readonly (dateChange)="changeParametros()">
+                    <mat-datepicker-toggle matSuffix [for]="datePickerFim"></mat-datepicker-toggle>
+                    <mat-datepicker #datePickerFim disabled="false"></mat-datepicker>
+                    <mat-error *ngIf="formSearch.get('dataFim').invalid">{{getRequiredMessage('dataFim')}}</mat-error>
+                </mat-form-field>
+            </div>
+            <div class="col-md-2" *ngIf="consultaAnalitica()">
+                <mat-form-field>
+                    <input matInput placeholder="Cod. Erro" formControlName="codErro" >
+                </mat-form-field>
+            </div>                             
+            <div class="col-md-1">
+                <button class="mt10" type="submit" mat-raised-button color="primary">Buscar</button>
+            </div>
+            <div class="col-md-1" *ngIf="exibirBotaoExport()">
+                <button class="mt10" type="button" mat-raised-button color="primary" (click)="clickExport()" >Export Excel</button>
+            </div>            
+        </div>
+    </div>
+</form>
+<div class="totalizacao" *ngIf="consultaAnalitica()">
+    <span style="margin-right: 10px">{{tpTransacaoSelectedDescricao}}:</span>
+    <span style="margin-right: 10px"><strong>Qtd: </strong>{{qtdTotal}}</span>
+    <span style="margin-right: 10px"><strong>Valor: </strong> {{formataValor(vlrTotal)}}</span>
+</div>
+
+    
+<div class="totalizacao" *ngIf="exibeOutrosTotais()">
+    <span style="margin-right: 10px; margin-left: 10px;">&nbsp;|&nbsp;</span>
+    <span style="margin-right: 10px">{{nomeFiltro}}:</span>
+    <span style="margin-right: 10px"><strong>Qtd: </strong>{{qtdFiltro}}</span>
+    <span style="margin-right: 10px"><strong>Valor: </strong> {{formataValor(vlrFiltro)}}</span>
+    <span style="margin-right: 10px; margin-left: 10px;">&nbsp;|&nbsp;</span>
+    <span style="margin-right: 10px"><strong>Qtd Liq: </strong> {{qtdLiq}}</span>
+    <span style="margin-right: 10px"><strong>Valor Liq: </strong> {{formataValor(valorLiq)}}</span>
+</div>

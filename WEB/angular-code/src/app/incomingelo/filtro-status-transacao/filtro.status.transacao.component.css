@@ -1,0 +1,41 @@
+.tabela-padrao {
+    width: 100%;
+  }
+
+.button-row {
+  display: flex;
+}
+
+.periodo-de {
+    float: left;
+    display: block;
+    margin-top: 20px;
+    margin-left: 15px;
+}
+
+.perido-a {
+    float: left;
+    display: block;
+    margin-top: 20px;
+}
+
+.mt10 {
+    margin-top: 10px;
+}
+
+.mt5 {
+    margin-top: 5px;
+}
+
+.totalizacao {
+    float: right;
+}
+
+.filtro {
+    margin-left: 15px;
+    float: left;
+}
+
+.filtro-item {
+    margin-right: 20px;
+}

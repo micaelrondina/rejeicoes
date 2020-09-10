@@ -1,0 +1,543 @@
+<mat-dialog-content class="my-mat-dialog-content">
+    <div class="conteudo">
+        <mat-tab-group [selectedIndex]="selectedTab" (selectedIndexChange)="changeTab($event)">
+            <mat-tab>
+                <ng-template mat-tab-label>
+                    <mat-icon>history</mat-icon>
+                    Histórico de Rejeições
+                </ng-template>
+                <mat-card>
+                    <div *ngIf=!temDadosHist>
+                        {{mensagemHist}}
+                    </div>
+                    <div *ngIf="temDadosHist">
+                        <table mat-table [dataSource]="listHistorico" class="tabela-historico">
+        
+                            <ng-container matColumnDef="CUPON">
+                                <th mat-header-cell *matHeaderCellDef style="min-width: 100px"> Cupom </th>
+                                <td mat-cell class="tabela-id" *matCellDef="let element"> {{element.cupon}} </td>
+                            </ng-container>
+        
+                            <ng-container matColumnDef="CUOTAS_VAN">
+                                <th mat-header-cell *matHeaderCellDef style="min-width: 100px" > Parcelas </th>
+                                <td mat-cell *matCellDef="let element"> {{element.cuotasVan}} </td>
+                            </ng-container>
+        
+                            <ng-container matColumnDef="TRAN_CODE">
+                                <th mat-header-cell *matHeaderCellDef style="min-width: 100px"> Tran Code </th>
+                                <td mat-cell *matCellDef="let element"> {{element.tranCode}} </td>
+                            </ng-container>
+                            
+                            <ng-container matColumnDef="PRODUCTO">
+                                <th mat-header-cell *matHeaderCellDef style="min-width: 100px" > Produto </th>
+                                <td mat-cell *matCellDef="let element"> {{element.producto}} </td>
+                            </ng-container>                            
+                            
+                            <ng-container matColumnDef="FECHA_OUTGOING">
+                                <th mat-header-cell *matHeaderCellDef style="min-width: 100px" > Data Outgoing </th>
+                                <td mat-cell *matCellDef="let element"> {{element.fechaOutgoing | formatDateStr}} </td>
+                            </ng-container>
+        
+                            <ng-container matColumnDef="IMPORTE">
+                                <th mat-header-cell *matHeaderCellDef style="min-width: 100px" > Valor </th>
+                                <td mat-cell *matCellDef="let element"> {{element.importe.toLocaleString('pt-br', {minimumFractionDigits: 2})}} </td>
+                            </ng-container>
+                            
+                            <ng-container matColumnDef="MARCA">
+                                <th mat-header-cell *matHeaderCellDef style="min-width: 100px"> Marca </th>
+                                <td mat-cell *matCellDef="let element"> {{element.marca}} </td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="ACQUIRER_REF_NUM">
+                                <th mat-header-cell *matHeaderCellDef style="min-width: 150px"> Nº Ref. Transação </th>
+                                <td mat-cell *matCellDef="let element"> {{element.acquirerRefNum}} </td>
+                            </ng-container>
+        
+                            <tr mat-header-row *matHeaderRowDef="displayedColumnsHist; sticky: true"></tr>
+                            <tr mat-row *matRowDef="let row; columns: displayedColumnsHist;" ></tr>
+                        </table>
+                    </div>
+                </mat-card>
+            </mat-tab>
+
+            <!-- ABA Mais Informações -->
+            <mat-tab>
+                <ng-template mat-tab-label>
+                    <mat-icon>zoom_in</mat-icon>
+                    Mais Informações
+                </ng-template>
+                <div *ngIf=!temDadosMaisInfo>
+                    {{mensagemMaisInfo}}
+                </div>
+                <div *ngIf="temDadosMaisInfo">
+                    <mat-tab-group>
+                        <mat-tab label="Dados Principais" *ngIf="maisInformacoes.incoming"> 
+                            <!-- Expansion Panels -->
+                            <mat-accordion class="painel-expansivo">
+                                <!-- Panel 1 - INICIO -->
+                                <mat-expansion-panel>
+                                    <mat-expansion-panel-header>
+                                        <mat-panel-title>Header - Tipo "B0"</mat-panel-title>
+                                    </mat-expansion-panel-header>
+                                    <div class="info info-left">
+                                        <div><label>ID: </label>{{maisInformacoes.incoming.idIncomingElo}}</div>
+                                        <div><label>Nome Arquivo: </label>{{maisInformacoes.incoming.nmArquivo}}</div>
+                                        <div><label>Código do Registro: </label>{{maisInformacoes.incoming.cdRegistroB0}}</div>
+                                        <div><label>Código do Serviço: </label>{{maisInformacoes.incoming.cdServicoB0}} - {{maisInformacoes.incoming.mapDescricoesCodigos?.cdServicoB0}}</div>
+                                        <div><label>Data da Remessa: </label>{{maisInformacoes.incoming.dtRemessa | formatDateStr}}</div>
+                                        <div><label>Número da Remessa: </label>{{maisInformacoes.incoming.nrRemessaB0}}</div>
+                                        <div><label>Número da Janela: </label>{{maisInformacoes.incoming.nrJanela}}</div>
+                                        <div><label>Data de Envio: </label>{{maisInformacoes.incoming.dtEnvio | formatDateStr}}</div>
+                                        <div><label>Hora de Envio do Arquivo: </label>{{maisInformacoes.incoming.hrEnvioArq | formatTimeStr}}</div>
+                                    </div>
+                                    <div class="info info-right">
+                                        <div><label>Data de Retorno do Arquivo: </label>{{maisInformacoes.incoming.dtRetornoArq | formatDateStr}}</div>
+                                        <div><label>Hora de Retorno do Arquivo: </label>{{maisInformacoes.incoming.hrRetornoArq | formatTimeStr}}</div>
+                                        <div><label>Banco Emissor: </label>{{maisInformacoes.incoming.bancoEmissorB0}}</div>
+                                        <div><label>Código da Processadora: </label>{{maisInformacoes.incoming.cdProcessadora}}</div>
+                                        <div><label>Versão do arquivo: </label>{{maisInformacoes.incoming.versaoArq}}</div>
+                                        <div><label>Código do Credenciador: </label>{{maisInformacoes.incoming.cdCredenciador}} - {{maisInformacoes.incoming.mapDescricoesCodigos?.cdCredenciador}}</div>
+                                        <div><label>Código da Bandeira: </label>{{maisInformacoes.incoming.cdBandeiraB0}} - {{maisInformacoes.incoming.mapDescricoesCodigos?.cdBandeiraB0}}</div>
+                                        <div><label>Indicador de Rota do Arquivo: </label>{{maisInformacoes.incoming.indicadorRotaArqB0}}</div>
+                                    </div>
+                                </mat-expansion-panel>
+                                <!-- Panel 1 - FIM -->
+
+                                <!-- Panel 2 - INICIO -->
+                                <mat-expansion-panel>
+                                    <mat-expansion-panel-header>
+                                        <mat-panel-title>Transação TE44 - Tipo "00"</mat-panel-title>
+                                    </mat-expansion-panel-header>
+                                    <div class="info info-left">
+                                        <div><label>Código da Transação: </label>{{maisInformacoes.incoming.cdTransacao}} - {{maisInformacoes.incoming.mapDescricoesCodigos?.cdTransacao}}</div>
+                                        <div><label>Subcódigo da Transação: </label>{{maisInformacoes.incoming.subCdTransacao}}</div>
+                                        <div><label>Banco Emissor: </label>{{maisInformacoes.incoming.bancoEmissor00}}</div>
+                                        <div><label>Data do Movimento: </label>{{maisInformacoes.incoming.dtMovimento | formatDateStr}}</div>
+                                        <div><label>Número da remessa: </label>{{maisInformacoes.incoming.nrRemessa00}}</div>
+                                        <div><label>Data de Confirmação da Remessa: </label>{{maisInformacoes.incoming.dtConfirmRemessa | formatDateStr}}</div>
+                                        <div><label>Situação da Remessa: </label>{{maisInformacoes.incoming.stRemessa}} - {{maisInformacoes.incoming.mapDescricoesCodigos?.stRemessa}}</div>
+                                        <div><label>Motivo da Rejeição: </label>{{maisInformacoes.incoming.motivoRejeicao}}</div>
+                                        <div><label>Código da Moeda da Transação: </label>{{maisInformacoes.incoming.cdMoedaTransacao}} - {{maisInformacoes.incoming.mapDescricoesCodigos?.cdMoedaTransacao}}</div>
+                                        <div><label>Indicador de Tipo de Retorno: </label>{{maisInformacoes.incoming.indicadorTpRetorno}} - {{maisInformacoes.incoming.mapDescricoesCodigos?.indicadorTpRetorno}}</div>
+                                    </div>
+                                    <div class="info info-right">
+                                        <div><label>Quantidade Total de Registros no Arquivo: </label>{{getNumber(maisInformacoes.incoming.qtTotRegArq)}}</div>
+                                        <div><label>Quantidade de Transações Aceitas em Moeda Real: </label>{{getNumber(maisInformacoes.incoming.qtTransAcMoedaReal)}}</div>
+                                        <div><label>Valor das Transações Aceitas em Moeda Real: </label>{{maisInformacoes.incoming.vlTransAcMoedaReal.toLocaleString('pt-br', {minimumFractionDigits: 2})}}</div>
+                                        <div><label>Quantidade de Transações Rejeitadas em Moeda Real: </label>{{getNumber(maisInformacoes.incoming.qtTransRjMoedaReal)}}</div>
+                                        <div><label>Valor das Transações Rejeitadas em Moeda Real: </label>{{maisInformacoes.incoming.vlTransRjMoedaReal.toLocaleString('pt-br', {minimumFractionDigits: 2})}}</div>
+                                        <div><label>Código da Bandeira: </label>{{maisInformacoes.incoming.cdBandeira00}} - {{maisInformacoes.incoming.mapDescricoesCodigos?.cdBandeira00}}</div>
+                                        <div><label>Quantidade de Transações Aceitas em Moeda Dólar: </label>{{getNumber(maisInformacoes.incoming.qtTransAcMoedaDolar)}}</div>
+                                        <div><label>Valor das Transações Aceitas em Moeda Dólar: </label>{{maisInformacoes.incoming.vlTransAcMoedaDolar.toLocaleString('pt-br', {minimumFractionDigits: 2})}}</div>
+                                        <div><label>Quantidade de Transações Rejeitadas em Moeda Dólar: </label>{{getNumber(maisInformacoes.incoming.qtTransRjMoedaDolar)}}</div>
+                                        <div><label>Valor das Transações Rejeitadas em Moeda Dólar: </label>{{maisInformacoes.incoming.vlTransRjMoedaDolar.toLocaleString('pt-br', {minimumFractionDigits: 2})}}</div>
+                                    </div>
+                                </mat-expansion-panel>
+                                <!-- Panel 2 - FIM -->
+
+                                <!-- Panel 3 - INICIO -->
+                                <mat-expansion-panel>
+                                    <mat-expansion-panel-header>
+                                        <mat-panel-title>Trailer - Tipo "BZ"</mat-panel-title>
+                                    </mat-expansion-panel-header>
+                                    <div class="info info-left">
+                                        <div><label>Código do Registro: </label>{{maisInformacoes.incoming.cdRegistroBz}}</div>
+                                        <div><label>Código do Serviço: </label>{{maisInformacoes.incoming.cdServicoBz}} - {{maisInformacoes.incoming.mapDescricoesCodigos?.cdServicoBz}}</div>
+                                        <div><label>Número da Remessa: </label>{{maisInformacoes.incoming.nrRemessaBz}}</div>
+                                        <div><label>Quantidade de Transações de Crédito em Moeda Real: </label>{{getNumber(maisInformacoes.incoming.qtTransCreMoedaReal)}}</div>
+                                        <div><label>Valor Total das Transações de Créditos em Moeda Real: </label>{{maisInformacoes.incoming.vlTransCreMoedaReal.toLocaleString('pt-br', {minimumFractionDigits: 2})}}</div>
+                                        <div><label>Quantidade de Transações de Débito em Moeda Real: </label>{{getNumber(maisInformacoes.incoming.qtTransDebMoedaReal)}}</div>
+                                        <div><label>Valor Total das Transações de Débitos em Moeda Real: </label>{{maisInformacoes.incoming.vlTransDebMoedaReal.toLocaleString('pt-br', {minimumFractionDigits: 2})}}</div>
+                                        <div><label>Quantidade de Transações de Crédito em Moeda Dólar: </label>{{getNumber(maisInformacoes.incoming.qtTransCreMoedaDolar)}}</div>
+                                        <div><label>Valor Total das Transações de Créditos em Moeda Dólar: </label>{{maisInformacoes.incoming.vlTransCreMoedaDolar.toLocaleString('pt-br', {minimumFractionDigits: 2})}}</div>
+                                        <div><label>Quantidade de Transações de Débito em Moeda Dólar: </label>{{getNumber(maisInformacoes.incoming.qtTransDebMoedaDolar)}}</div>
+                                        <div><label>Valor Total das Transações de Débitos em Moeda Dólar: </label>{{maisInformacoes.incoming.vlTransDebMoedaDolar.toLocaleString('pt-br', {minimumFractionDigits: 2})}}</div>
+                                    </div>
+                                    <div class="info info-right">   
+                                        <div><label>Quantidade Total de Registros: </label>{{getNumber(maisInformacoes.incoming.qtTotReg)}}</div>
+                                        <div><label>Quantidade de Transações de Movimentação de Parcelado: </label>{{getNumber(maisInformacoes.incoming.qtTransMoviParcelado)}}</div>
+                                        <div><label>Valor Total das Transações de Movimentação de Parcelado: </label>{{maisInformacoes.incoming.vlTransMoviParcelado.toLocaleString('pt-br', {minimumFractionDigits: 2})}}</div>
+                                        <!-- CAMPOS INCLUIDOS DEVIDO A ALTERACOES REALIZADAS PELA ELO NO LAYOUT DOS ARQUIVOS - VERSAO 19.2 - INICIO -->
+                                        <div><label>Quantidade de Transações de Crédito Rejeitadas pela Elo em Moeda Real: </label>{{getNumber(maisInformacoes.incoming.qtTransCreRjMoedaReal)}}</div>
+                                        <div><label>Valor Total das Transações de Crédito Rejeitadas pela Elo em Moeda Real: </label>{{getNumber(maisInformacoes.incoming.vlTotTransCreRjMoedaReal).toLocaleString('pt-br', {minimumFractionDigits: 2})}}</div>
+                                        <div><label>Quantidade de Transações de Débito Rejeitadas pela Elo em Moeda Real: </label>{{getNumber(maisInformacoes.incoming.qtTransDebRjMoedaReal)}}</div>
+                                        <div><label>Valor Total das Transações de Débito Rejeitadas pela Elo em Moeda Real: </label>{{getNumber(maisInformacoes.incoming.vlTotTransDebRjMoedaReal).toLocaleString('pt-br', {minimumFractionDigits: 2})}}</div>
+                                        <!-- -->
+                                        <div><label>Indicador de Rota do Arquivo: </label>{{maisInformacoes.incoming.indicadorRotaArqBz}}</div>
+                                    </div>
+                                </mat-expansion-panel>
+                                <!-- Panel 3 - FIM -->
+                            </mat-accordion>
+                        </mat-tab>
+                        <mat-tab label="Detalhes Transação Padrão" *ngIf="maisInformacoes.incomingItem">
+                            <!-- Expansion Panels -->
+                            <mat-accordion class="painel-expansivo">
+                                <!-- Panel 1 - INICIO -->
+                                <mat-expansion-panel>
+                                    <mat-expansion-panel-header>
+                                        <mat-panel-title>Dados Principais - "00"</mat-panel-title>
+                                    </mat-expansion-panel-header>
+                                    <div class="info info-left">
+                                        <div><label>ID Master: </label>{{maisInformacoes.incomingItem.idIncomingElo}}</div>
+                                        <div><label>ID Item: </label>{{maisInformacoes.incomingItem.idIncomingEloItem}}</div>
+                                        <div><label>Código da Transação: </label>{{maisInformacoes.incomingItem.cdTransacao00}} - {{maisInformacoes.incomingItem.mapDescricoesCodigos?.cdTransacao00}}</div>
+                                        <div><label>Subcódigo da Transação: </label>{{maisInformacoes.incomingItem.subCdTransacao00}}</div>
+                                        <div><label>Número do Cartão: </label>{{maisInformacoes.incomingItem.nrCartao}}</div>
+                                        <div><label>Tipo de Liquidação: </label>{{maisInformacoes.incomingItem.tpLiquidacao}}</div>
+                                        <div><label>Ind. Origem da Autorização ou Cancelamento: </label>{{maisInformacoes.incomingItem.indOrigemAuthCanc}} - {{maisInformacoes.incomingItem.mapDescricoesCodigos?.indOrigemAuthCanc}}</div>
+                                        <div><label>Número de Referência da Transação: </label>{{maisInformacoes.incomingItem.nrRefTransacao}}</div>
+                                        <div><label>Código de Processo: </label>{{maisInformacoes.incomingItem.cdProcesso}}</div>
+                                        <div><label>Código do Credenciador: </label>{{maisInformacoes.incomingItem.cdCredenciador}} - {{maisInformacoes.incomingItem.mapDescricoesCodigos?.cdCredenciador}}</div>
+                                        <div><label>Data da Venda/Saque: </label>{{maisInformacoes.incomingItem.dtVendaSaque | formatDateStr}}</div>
+                                        <div><label>Hora da Venda/Saque: </label>{{maisInformacoes.incomingItem.hrVendaSaque | formatTimeStr}}</div>
+                                        <div><label>Valor da Venda/Saque ou Valor da Disputa: </label>{{maisInformacoes.incomingItem.vlVendaSaqueDisputa.toLocaleString('pt-br', {minimumFractionDigits: 2})}}</div>
+                                        <div><label>Código da Moeda da Transação: </label>{{maisInformacoes.incomingItem.cdMoedaTransacao}} - {{maisInformacoes.incomingItem.mapDescricoesCodigos?.cdMoedaTransacao}}</div>
+                                    </div>
+                                    <div class="info info-right">
+                                        <div><label>Nome do PV (Ponto de Venda): </label>{{maisInformacoes.incomingItem.nmPontoVenda}}</div>
+                                        <div><label>Cidade do PV (Ponto de Venda): </label>{{maisInformacoes.incomingItem.cidadePontoVenda}}</div>
+                                        <div><label>Código do País do PV (Ponto de Venda): </label>{{maisInformacoes.incomingItem.cdPaisPontoVenda}}</div>
+                                        <div><label>MCC do PV (Ponto de Venda): </label>{{maisInformacoes.incomingItem.mccPontoVenda}}</div>
+                                        <div><label>Banco Emissor: </label>{{maisInformacoes.incomingItem.bancoEmissor}}</div>
+                                        <div><label>Código da Bandeira: </label>{{maisInformacoes.incomingItem.cdBandeira}} - {{maisInformacoes.incomingItem.mapDescricoesCodigos?.cdBandeira}}</div>
+                                        <div><label>Identificação do Tipo de Transação: </label>{{maisInformacoes.incomingItem.identTpTransacao}} - {{maisInformacoes.incomingItem.mapDescricoesCodigos?.identTpTransacao}}</div>
+                                        <div><label>Código de Motivo da Disputa: </label>{{maisInformacoes.incomingItem.cdMotivoDisputa}}</div>
+                                        <div><label>Código de Autorização da Transação: </label>{{maisInformacoes.incomingItem.cdAuthTransacao}}</div>
+                                        <div><label>Indicador de Tecnologia do Terminal: </label>{{maisInformacoes.incomingItem.indicadorTecnoTerminal}} - {{maisInformacoes.incomingItem.mapDescricoesCodigos?.indicadorTecnoTerminal}}</div>
+                                        <div><label>Meio de Identificação do Portador: </label>{{maisInformacoes.incomingItem.meioIdentPortador}}</div>
+                                        <div><label>Modo de Entrada da Transação no POS: </label>{{maisInformacoes.incomingItem.modoEntTransacaoPos}} - {{maisInformacoes.incomingItem.mapDescricoesCodigos?.modoEntTransacaoPos}}</div>
+                                        <div><label>Data do Movimento/Data de apresentação da Disputa: </label>{{maisInformacoes.incomingItem.dtMovApresentDisputa | formatDateStr}}</div>
+                                    </div>
+                                </mat-expansion-panel>
+                                <!-- Panel 1 - FIM -->
+
+                                <!-- Panel 2 - INICIO -->
+                                <mat-expansion-panel>
+                                    <mat-expansion-panel-header>
+                                        <mat-panel-title>Dados Adicionais - "01"</mat-panel-title>
+                                    </mat-expansion-panel-header>
+                                    <div class="info info-left">
+                                        <div><label>Código da Transação: </label>{{maisInformacoes.incomingItem.cdTransacao01}} - {{maisInformacoes.incomingItem.mapDescricoesCodigos?.cdTransacao01}}</div>
+                                        <div><label>Subcódigo da Transação: </label>{{maisInformacoes.incomingItem.subCdTransacao01}}</div>
+                                        <div><label>Número de Referência da Disputa: </label>{{maisInformacoes.incomingItem.nrRefDisputa}}</div>
+                                        <div><label>Indicador do Envio de Documentação: </label>{{maisInformacoes.incomingItem.indicadorEnvDoc}}</div>
+                                        <div><label>Texto Livre do Emissor e do Credenciador: </label>{{maisInformacoes.incomingItem.txtLivre}}</div>
+                                        <div><label>Código do produto: </label>{{maisInformacoes.incomingItem.cdProduto}} - {{maisInformacoes.incomingItem.mapDescricoesCodigos?.cdProduto}}</div>
+                                        <div><label>PV (Ponto de Venda): </label>{{maisInformacoes.incomingItem.pontoVenda}}</div>
+                                        <div><label>Número Lógico do Equipamento: </label>{{maisInformacoes.incomingItem.nrLogicoEquipamento}}</div>
+                                        <div><label>Valor Taxa de Embarque: </label>{{maisInformacoes.incomingItem.vlTaxaEmbarque.toLocaleString('pt-br', {minimumFractionDigits: 2})}}</div>
+                                        <div><label>Indicador de Transação feita por corresp./Telefone ou comércio eletrônico: </label>{{maisInformacoes.incomingItem.indicTransFeitaPor}} - {{maisInformacoes.incomingItem.mapDescricoesCodigos?.indicTransFeitaPor}}</div>
+                                    </div>
+                                    <div class="info info-right">
+                                        <div><label>Valor da Transação: </label>{{maisInformacoes.incomingItem.vlTransacao.toLocaleString('pt-br', {minimumFractionDigits: 2})}}</div>
+                                        <div><label>Indicador de Movimentação: </label>{{maisInformacoes.incomingItem.indicadorMovimentacao}}</div>
+                                        <div><label>Quantidade de Parcelas da Transação: </label>{{getNumber(maisInformacoes.incomingItem.qtParcelasTransacao)}}</div>
+                                        <div><label>Número da Parcela: </label>{{maisInformacoes.incomingItem.nrParcela}}</div>
+                                        <div><label>Tarifa Pagamento de Insumo: </label>{{maisInformacoes.incomingItem.tarifaPagtoInsumo.toLocaleString('pt-br', {minimumFractionDigits: 2})}}</div>
+                                        <div><label>Tipo de Pessoa: </label>{{maisInformacoes.incomingItem.tpPessoa}}</div>
+                                        <div><label>CNPJ ou CPF: </label>{{maisInformacoes.incomingItem.documento}}</div>
+                                        <div><label>Valor de Troco ou Agro Débito: </label>{{maisInformacoes.incomingItem.vlTrocoAgroDeb.toLocaleString('pt-br', {minimumFractionDigits: 2})}}</div>
+                                        <div><label>Código Condicional de Transação com Chip: </label>{{maisInformacoes.incomingItem.cdCondTransacaoChip}} - {{maisInformacoes.incomingItem.mapDescricoesCodigos?.cdCondTransacaoChip}}</div>
+                                    </div>
+                                </mat-expansion-panel>
+                                <!-- Panel 2 - FIM -->
+
+                                <!-- Panel 3 - INICIO -->
+                                <mat-expansion-panel>
+                                    <mat-expansion-panel-header>
+                                        <mat-panel-title>Dados do País de Liquidação - "02"</mat-panel-title>
+                                    </mat-expansion-panel-header>
+                                    <div class="info info-left">
+                                        <div><label>Código da Transação: </label>{{maisInformacoes.incomingItem.cdTransacao02}} - {{maisInformacoes.incomingItem.mapDescricoesCodigos?.cdTransacao02}}</div>
+                                        <div><label>Subcódigo da Transação: </label>{{maisInformacoes.incomingItem.subCdTransacao02}}</div>
+                                        <div><label>Código do País da Liquidação: </label>{{maisInformacoes.incomingItem.cdPaisLiq}}</div>
+                                        <div><label>Quantidade de Dias para Liquidação Financeira da Transação: </label>{{getNumber(maisInformacoes.incomingItem.qtDiasLiqFinanTransacao)}}</div>
+                                        <div><label>Valor do Intercâmbio: </label>{{maisInformacoes.incomingItem.vlIntercambio.toLocaleString('pt-br', {minimumFractionDigits: 2})}}</div>
+                                        <div><label>Data do Movimento da Transação Original: </label>{{maisInformacoes.incomingItem.dtMovTransacaoOriginal | formatDateStr}}</div>
+                                        <div><label>Tipo de Operação: </label>{{maisInformacoes.incomingItem.tpOperacao}} - {{maisInformacoes.incomingItem.mapDescricoesCodigos?.tpOperacao}}</div>
+                                    </div>
+                                    <div class="info info-right">    
+                                        <div><label>Token PAN: </label>{{maisInformacoes.incomingItem.tokenPan}}</div>
+                                        <div><label>Token Requestor ID: </label>{{maisInformacoes.incomingItem.tokenRequestorId}}</div>
+                                        <div><label>Token Assurance Level: </label>{{maisInformacoes.incomingItem.tokenAssuranceLevel}}</div>
+                                        <div><label>CEP do Estabelecimento Comercial: </label>{{maisInformacoes.incomingItem.cepEc}}</div>
+                                        <div><label>Data de liquidação da transação: </label>{{maisInformacoes.incomingItem.dtLiquiTransacao | formatDateStr}}</div>
+                                        <div><label>Código do PV no Marketplace: </label>{{maisInformacoes.incomingItem.cdPvMarketplace}}</div>
+                                    </div>
+                                </mat-expansion-panel>
+                                <!-- Panel 3 - FIM -->
+
+                                <!-- Panel 4 - INICIO -->
+                                <mat-expansion-panel>
+                                    <mat-expansion-panel-header>
+                                        <mat-panel-title>Dados de Transferência de Fundos - "03"</mat-panel-title>
+                                    </mat-expansion-panel-header>
+                                    <div class="info">
+                                        <div><label>Código da Transação: </label>{{maisInformacoes.incomingItem.cdTransacao03}} - {{maisInformacoes.incomingItem.mapDescricoesCodigos?.cdTransacao03}}</div>
+                                        <div><label>Subcódigo da Transação: </label>{{maisInformacoes.incomingItem.subCdTransacao03}}</div>
+                                        <div><label>Tipo de Pagamento: </label>{{maisInformacoes.incomingItem.tpPagto}}</div>
+                                        <div><label>Número da Conta ou Número Único de Referência: </label>{{maisInformacoes.incomingItem.nrContaUnicoRef}}</div>
+                                        <div><label>Nome do Remetente: </label>{{maisInformacoes.incomingItem.nmRemetente}}</div>
+                                        <div><label>Endereço do Remetente: </label>{{maisInformacoes.incomingItem.enderecoRemetente}}</div>
+                                        <div><label>Cidade do Remetente: </label>{{maisInformacoes.incomingItem.cidadeRemetente}}</div>
+                                        <div><label>País do Remetente: </label>{{maisInformacoes.incomingItem.paisRemetente}}</div>
+                                        <div><label>Origem dos Fundos: </label>{{maisInformacoes.incomingItem.origemFundos}} - {{maisInformacoes.incomingItem.mapDescricoesCodigos?.origemFundos}}</div>
+                                    </div>
+                                </mat-expansion-panel>
+                                <!-- Panel 4 - FIM -->
+
+                                <!-- Panel 5 - INICIO -->
+                                <mat-expansion-panel>
+                                    <mat-expansion-panel-header>
+                                        <mat-panel-title>Dados de Serviço de Pagamento - "05"</mat-panel-title>
+                                    </mat-expansion-panel-header>
+                                    <div class="info info-left">
+                                        <div><label>Código da Transação: </label>{{maisInformacoes.incomingItem.cdTransacao05}} - {{maisInformacoes.incomingItem.mapDescricoesCodigos?.cdTransacao05}}</div>
+                                        <div><label>Código Qualificador da Transação: </label>{{maisInformacoes.incomingItem.cdQualificadorTransacao05}}</div>
+                                        <div><label>Número de Sequência do Componente da Transação: </label>{{maisInformacoes.incomingItem.nrSeqCompTransacao05}}</div>
+                                        <div><label>Identificador da Transação: </label>{{maisInformacoes.incomingItem.idTransacao}}</div>
+                                        <div><label>Valor Autorizado: </label>{{maisInformacoes.incomingItem.vlAutorizado.toLocaleString('pt-br', {minimumFractionDigits: 2})}}</div>
+                                        <div><label>Código da Moeda do Valor Autorizado: </label>{{maisInformacoes.incomingItem.cdMoedaVlAutorizado}} - {{maisInformacoes.incomingItem.mapDescricoesCodigos?.cdMoedaVlAutorizado}}</div>
+                                        <div><label>Código de Resposta da Autorização: </label>{{maisInformacoes.incomingItem.cdRespAutorizacao}} - {{maisInformacoes.incomingItem.mapDescricoesCodigos?.cdRespAutorizacao}}</div>
+                                    </div>
+                                    <div class="info info-right">
+                                        <div><label>Indicador de Direito de Devolução: </label>{{maisInformacoes.incomingItem.indicadorDireitoDevolucao}} - {{maisInformacoes.incomingItem.mapDescricoesCodigos?.indicadorDireitoDevolucao}}</div>
+                                        <div><label>Indicador de Comércio Eletrônico (ECI): </label>{{maisInformacoes.incomingItem.indicadorComerEletronico}} - {{maisInformacoes.incomingItem.mapDescricoesCodigos?.indicadorComerEletronico}}</div>
+                                        <div><label>Indicador Autorização Específica: </label>{{maisInformacoes.incomingItem.indicadorAuthEspecifica}} - {{maisInformacoes.incomingItem.mapDescricoesCodigos?.indicadorAuthEspecifica}}</div>
+                                        <div><label>Valor Total Autorizado: </label>{{maisInformacoes.incomingItem.vlTotalAutorizado.toLocaleString('pt-br', {minimumFractionDigits: 2})}}</div>
+                                        <div><label>CAVV - Valor de Verificação de Autenticação do Portador: </label>{{maisInformacoes.incomingItem.cavvVlVerifAuthPortador}}</div>
+                                        <div><label>Código de Resultado da Verificação do CAVV: </label>{{maisInformacoes.incomingItem.cdResultVerifCavv}}</div>
+                                    </div>
+                                </mat-expansion-panel>
+                                <!-- Panel 5 - FIM -->
+
+                                <!-- Panel 6 - INICIO -->
+                                <mat-expansion-panel>
+                                    <mat-expansion-panel-header>
+                                        <mat-panel-title>Dados do Chip do Cartão - "07"</mat-panel-title>
+                                    </mat-expansion-panel-header>
+                                    <div class="info info-left">
+                                        <div><label>Código da Transação: </label>{{maisInformacoes.incomingItem.cdTransacao07}} - {{maisInformacoes.incomingItem.mapDescricoesCodigos?.cdTransacao07}}</div>
+                                        <div><label>Código Qualificador da Transação: </label>{{maisInformacoes.incomingItem.cdQualificadorTransacao07}}</div>
+                                        <div><label>Número de Sequência do Componente da Transação: </label>{{maisInformacoes.incomingItem.nrSeqCompTransacao07}}</div>
+                                        <div><label>Tipo de Transação: </label>{{maisInformacoes.incomingItem.tpTransacao}} - {{maisInformacoes.incomingItem.mapDescricoesCodigos?.tpTransacao}}</div>
+                                        <div><label>Número Sequencial do Cartão: </label>{{maisInformacoes.incomingItem.nrSeqCartao}}</div>
+                                        <div><label>Data de Transação do Terminal: </label>{{maisInformacoes.incomingItem.dtTransacaoTerminal}}</div>
+                                        <div><label>Capacidade do Terminal: </label>{{maisInformacoes.incomingItem.capacidadeTerminal}}</div>
+                                        <div><label>Código do País do Terminal: </label>{{maisInformacoes.incomingItem.cdPaisTerminal}}</div>
+                                        <div><label>Número de Série do Terminal: </label>{{maisInformacoes.incomingItem.nrSerieTerminal}}</div>
+                                        <div><label>Número Randômico para Criptograma: </label>{{maisInformacoes.incomingItem.nrRandomCriptograma}}</div>
+                                    </div>
+                                    <div class="info info-right">    
+                                        <div><label>Contador da Transação da Aplicação: </label>{{maisInformacoes.incomingItem.contadorTransacaoApp}}</div>
+                                        <div><label>Application Interchange Profile: </label>{{maisInformacoes.incomingItem.appInterchangeProfile}}</div>
+                                        <div><label>Criptograma: </label>{{maisInformacoes.incomingItem.criptograma}}</div>
+                                        <div><label>Índice de Derivação da Chave: </label>{{maisInformacoes.incomingItem.indiceDerivacaoChave}}</div>
+                                        <div><label>Número da Versão do Criptograma: </label>{{maisInformacoes.incomingItem.nrVersaoCriptograma}}</div>
+                                        <div><label>Verificação do Resultado do Terminal: </label>{{maisInformacoes.incomingItem.verifResultTerminal}}</div>
+                                        <div><label>Verificação do Resultado do Cartão: </label>{{maisInformacoes.incomingItem.verifResultCartao}}</div>
+                                        <div><label>Valor de Transação para Criptograma: </label>{{maisInformacoes.incomingItem.vlTransacaoCriptograma}}</div>
+                                        <div><label>Form Factor Indicator: </label>{{maisInformacoes.incomingItem.formFactorIndicator}}</div>
+                                    </div>
+                                </mat-expansion-panel>
+                                <!-- Panel 6 - FIM -->
+
+                                <!-- Panel 7 - INICIO -->
+                                <mat-expansion-panel>
+                                    <mat-expansion-panel-header>
+                                        <mat-panel-title>Dados de Companhias Aéreas - "08"</mat-panel-title>
+                                    </mat-expansion-panel-header>
+                                    <div class="info info-left">
+                                        <div><label>Código da Transação: </label>{{maisInformacoes.incomingItem.cdTransacao08}} - {{maisInformacoes.incomingItem.mapDescricoesCodigos?.cdTransacao08}}</div>
+                                        <div><label>Subcódigo da Transação: </label>{{maisInformacoes.incomingItem.subCdTransacao08}}</div>
+                                        <div><label>Código da Companhia Aérea: </label>{{maisInformacoes.incomingItem.cdCompanhiaAerea}}</div>
+                                        <div><label>Número do Documento de Embarque: </label>{{maisInformacoes.incomingItem.nrDocEmbarque}}</div>
+                                        <div><label>Código do Agente IATA: </label>{{maisInformacoes.incomingItem.cdAgenteIata}}</div>
+                                        <div><label>Nome do Passageiro: </label>{{maisInformacoes.incomingItem.nmPassageiro}}</div>
+                                        <div><label>Código da Cidade 1: </label>{{maisInformacoes.incomingItem.cdCidade1}}</div>
+                                        <div><label>Transportadora 1: </label>{{maisInformacoes.incomingItem.transportadora1}}</div>
+                                        <div><label>Classe de Serviço 1: </label>{{maisInformacoes.incomingItem.classeServico1}}</div>
+                                        <div><label>Código da Cidade 2: </label>{{maisInformacoes.incomingItem.cdCidade2}}</div>
+                                        <div><label>Transportadora 2: </label>{{maisInformacoes.incomingItem.transportadora2}}</div>
+                                        <div><label>Classe de Serviço 2: </label>{{maisInformacoes.incomingItem.classeServico2}}</div>
+                                    </div>
+                                    <div class="info info-right">    
+                                        <div><label>Código da Cidade 3: </label>{{maisInformacoes.incomingItem.cdCidade3}}</div>
+                                        <div><label>Transportadora 3: </label>{{maisInformacoes.incomingItem.transportadora3}}</div>
+                                        <div><label>Classe de Serviço 3: </label>{{maisInformacoes.incomingItem.classeServico3}}</div>
+                                        <div><label>Código da Cidade 4: </label>{{maisInformacoes.incomingItem.cdCidade4}}</div>
+                                        <div><label>Transportadora 4: </label>{{maisInformacoes.incomingItem.transportadora4}}</div>
+                                        <div><label>Classe de Serviço 4: </label>{{maisInformacoes.incomingItem.classeServico4}}</div>
+                                        <div><label>Código da Cidade 5: </label>{{maisInformacoes.incomingItem.cdCidade5}}</div>
+                                        <div><label>Código do Aeroporto de Destino: </label>{{maisInformacoes.incomingItem.cdAeroportoDestino}}</div>
+                                        <div><label>Data do Primeiro Voo: </label>{{maisInformacoes.incomingItem.dtPrimeiroVoo | formatDateStr}}</div>
+                                        <div><label>Nome do Agente Emissor do Documento: </label>{{maisInformacoes.incomingItem.nmAgenteEmissorDoc}}</div>
+                                    </div>
+                                </mat-expansion-panel>
+                                <!-- Panel 7 - FIM -->
+
+                                <!-- Panel 8 - INICIO -->
+                                <mat-expansion-panel>
+                                    <mat-expansion-panel-header>
+                                        <mat-panel-title>Dados do Motivo de Rejeição Parcial - "09"</mat-panel-title>
+                                    </mat-expansion-panel-header>
+                                    <div class="info">
+                                        <div><label>Código da Transação: </label>{{maisInformacoes.incomingItem.cdTransacao09}} - {{maisInformacoes.incomingItem.mapDescricoesCodigos?.cdTransacao09}}</div>
+                                        <div><label>Subcódigo da Transação: </label>{{maisInformacoes.incomingItem.subCdTransacao09}}</div>
+                                        <div><label>Código da Transação original: </label>{{maisInformacoes.incomingItem.cdTransacaoOriginal}} - {{maisInformacoes.incomingItem.mapDescricoesCodigos?.cdTransacaoOriginal}}</div>
+                                        <div><label>Data do Movimento: </label>{{maisInformacoes.incomingItem.dtMovimento | formatDateStr}}</div>
+                                        <div><label>Código do Erro: </label>{{maisInformacoes.incomingItem.cdErro}}</div>
+                                        <div><label>Descrição do Erro: </label>{{getDescricaoErro(maisInformacoes.incomingItem.descricaoErro, maisInformacoes.incomingItem.mapDescricoesCodigos?.cdErro)}}</div>
+                                        <div><label>Registro com Erro: </label>{{maisInformacoes.incomingItem.registroComErro}}</div>
+                                        <div><label>Posição com Erro: </label>{{maisInformacoes.incomingItem.posicaoComErro}}</div>
+                                    </div>
+                                </mat-expansion-panel>
+                                <!-- Panel 8 - FIM -->
+                            </mat-accordion>
+                            <br />
+                            <br />
+                            <div class="info">
+                                <div><label>Usuário Liberação: </label>{{maisInformacoes.incomingItem.loginUsuLiberacao}}</div>
+                                <div><label>Data Liberação: </label>{{maisInformacoes.incomingItem.dtLiberacao | date:'dd/MM/yyyy'}}</div>
+                                <div><label>Usuário Acatado: </label>{{maisInformacoes.incomingItem.loginUsuAcatado}}</div>
+                                <div><label>Data Acatado: </label>{{maisInformacoes.incomingItem.dtAcatado | date:'dd/MM/yyyy'}}</div>
+                                <div><label>Usuário Rejeição: </label>{{maisInformacoes.incomingItem.loginUsuRejeicao}}</div>
+                                <div><label>Data Rejeição: </label>{{maisInformacoes.incomingItem.dtRejeicao | date:'dd/MM/yyyy'}}</div>
+                            </div>
+                        </mat-tab>
+                        <mat-tab label="Detalhes Transação TE10 e TE20" *ngIf="maisInformacoes.incomingItemTE1020">
+                            <div class="info">
+                                <div><label>ID Master: </label>{{maisInformacoes.incomingItemTE1020.idIncomingElo}}</div>
+                                <div><label>ID Item: </label>{{maisInformacoes.incomingItemTE1020.idIncomingEloItem}}</div>
+                            </div>                        
+                            <!-- Expansion Panels -->
+                            <mat-accordion class="painel-expansivo">
+                                <!-- Panel 1 - INICIO -->
+                                <mat-expansion-panel>
+                                    <mat-expansion-panel-header>
+                                        <mat-panel-title>Ajuste Financeiro de Disputa - "00"</mat-panel-title>
+                                    </mat-expansion-panel-header>
+                                    <div class="info">
+                                        <div><label>Código da Transação: </label>{{maisInformacoes.incomingItemTE1020.cdTransacao00}} - {{maisInformacoes.incomingItemTE1020.mapDescricoesCodigos?.cdTransacao00}}</div>
+                                        <div><label>Subcódigo da Transação: </label>{{maisInformacoes.incomingItemTE1020.subCdTransacao00}}</div>
+                                        <div><label>Código de Destino: </label>{{maisInformacoes.incomingItemTE1020.cdDestino}}</div>
+                                        <div><label>Código da Origem: </label>{{maisInformacoes.incomingItemTE1020.cdOrigem}}</div>
+                                        <div><label>Código de Motivo da Transação: </label>{{maisInformacoes.incomingItemTE1020.cdMotivoTransacao}}</div>
+                                        <div><label>Código do País: </label>{{maisInformacoes.incomingItemTE1020.cdPais00}}</div>
+                                        <div><label>Data de Envio: </label>{{maisInformacoes.incomingItemTE1020.dtEnvio | formatDateStr}}</div>
+                                        <div><label>Número do Cartão: </label>{{maisInformacoes.incomingItemTE1020.nrCartao}}</div>
+                                        <div><label>Valor de Destino: </label>{{maisInformacoes.incomingItemTE1020.vlDestino.toLocaleString('pt-br', {minimumFractionDigits: 2})}}</div>
+                                        <div><label>Código da Moeda de Destino: </label>{{maisInformacoes.incomingItemTE1020.cdMoedaDestino}} - {{maisInformacoes.incomingItemTE1020.mapDescricoesCodigos?.cdMoedaDestino}}</div>
+                                        <div><label>Valor de Origem: </label>{{maisInformacoes.incomingItemTE1020.vlOrigem.toLocaleString('pt-br', {minimumFractionDigits: 2})}}</div>
+                                        <div><label>Código da Moeda de Origem: </label>{{maisInformacoes.incomingItemTE1020.cdMoedaOrigem}} - {{maisInformacoes.incomingItemTE1020.mapDescricoesCodigos?.cdMoedaOrigem}}</div>
+                                        <div><label>Mensagem de Texto: </label>{{maisInformacoes.incomingItemTE1020.msgTexto}}</div>
+                                        <div><label>Indicador de Liquidação: </label>{{maisInformacoes.incomingItemTE1020.indicadorLiq}} - {{maisInformacoes.incomingItemTE1020.mapDescricoesCodigos?.indicadorLiq}}</div>
+                                        <div><label>Identificador da Transação Original: </label>{{maisInformacoes.incomingItemTE1020.idTransacaoOriginal}}</div>
+                                        <div><label>Data de Processamento: </label>{{maisInformacoes.incomingItemTE1020.dtProcessamento | formatDateStr}}</div>
+                                    </div>
+                                </mat-expansion-panel>
+                                <!-- Panel 1 - FIM -->
+
+                                <!-- Panel 2 - INICIO -->
+                                <mat-expansion-panel>
+                                    <mat-expansion-panel-header>
+                                        <mat-panel-title>Dados Adicionais de Transferência de Fundos - "02"</mat-panel-title>
+                                    </mat-expansion-panel-header>
+                                    <div class="info">
+                                        <div><label>Código da Transação: </label>{{maisInformacoes.incomingItemTE1020.cdTransacao02}} - {{maisInformacoes.incomingItemTE1020.mapDescricoesCodigos?.cdTransacao02}}</div>
+                                        <div><label>Subcódigo da Transação: </label>{{maisInformacoes.incomingItemTE1020.subCdTransacao02}}</div>
+                                        <div><label>Código do País: </label>{{maisInformacoes.incomingItemTE1020.cdPais02}}</div>
+                                        <div><label>Quantidade de Dias para Liquidação Financeira da Transação: </label>{{getNumber(maisInformacoes.incomingItemTE1020.qtDiasLiqFinanTransacao)}}</div>
+                                        <div><label>Data de Processamento: </label>{{maisInformacoes.incomingItemTE1020.dtProcessamentoRegTp02 | formatDateStr}}</div>
+                                        <div><label>Código do Erro: </label>{{maisInformacoes.incomingItemTE1020.cdErro}}</div>
+                                        <div><label>Token PAN: </label>{{maisInformacoes.incomingItemTE1020.tokenPan}}</div>
+                                        <div><label>Data de Liquidação da transação: </label>{{maisInformacoes.incomingItemTE1020.dtLiqTransacao | formatDateStr}}</div>
+                                    </div>
+                                </mat-expansion-panel>
+                                <!-- Panel 2 - FIM -->
+                            </mat-accordion>
+                        </mat-tab>
+                        <mat-tab label="Detalhes Transação TE40" *ngIf="maisInformacoes.incomingItemTE40">
+                            <div class="info">
+                                <div><label>ID Master: </label>{{maisInformacoes.incomingItemTE40.idIncomingElo}}</div>
+                                <div><label>ID Item: </label>{{maisInformacoes.incomingItemTE40.idIncomingEloItem}}</div>
+                            </div>
+                            <!-- Expansion Panels -->
+                            <mat-accordion class="painel-expansivo">
+                                <!-- Panel 1 - INICIO -->
+                                <mat-expansion-panel>
+                                    <mat-expansion-panel-header>
+                                        <mat-panel-title>Dados de Aviso de Fraude - "00"</mat-panel-title>
+                                    </mat-expansion-panel-header>
+                                    <div class="info">
+                                        <div><label>Código da Transação: </label>{{maisInformacoes.incomingItemTE40.cdTransacao00}} - {{maisInformacoes.incomingItemTE40.mapDescricoesCodigos?.cdTransacao00}}</div>
+                                        <div><label>Subcódigo da Transação: </label>{{maisInformacoes.incomingItemTE40.subCdTransacao00}}</div>
+                                        <div><label>Número do Cartão: </label>{{maisInformacoes.incomingItemTE40.nrCartao}}</div>
+                                        <div><label>Complemento do Número do Cartão: </label>{{maisInformacoes.incomingItemTE40.complementoNrCartao}}</div>
+                                        <div><label>Número de Referência da Transação: </label>{{maisInformacoes.incomingItemTE40.nrRefTransacao}}</div>
+                                        <div><label>Código do Credenciador: </label>{{maisInformacoes.incomingItemTE40.cdCredenciador}} - {{maisInformacoes.incomingItemTE40.mapDescricoesCodigos?.cdCredenciador}}</div>
+                                        <div><label>Data da Venda/Saque: </label>{{maisInformacoes.incomingItemTE40.dtVendaSaque | formatDateStr}}</div>
+                                        <!-- CAMPOS INCLUIDOS DEVIDO A ALTERACOES REALIZADAS PELA ELO NO LAYOUT DOS ARQUIVOS - VERSAO 19.2 - INICIO -->
+                                        <div><label>Código de Erro: </label>{{maisInformacoes.incomingItemTE40.cdErro}}</div>
+                                        <!-- -->
+                                        <div><label>Cidade do PV (Ponto de Venda): </label>{{maisInformacoes.incomingItemTE40.cidadePontoVenda}}</div>
+                                        <div><label>Código do País do PV (Ponto de Venda): </label>{{maisInformacoes.incomingItemTE40.cdPaisPontoVenda}}</div>
+                                        <div><label>MCC do PV (Ponto de Venda): </label>{{maisInformacoes.incomingItemTE40.mccPontoVenda}}</div>
+                                        <div><label>Valor da Fraude: </label>{{maisInformacoes.incomingItemTE40.vlFraude.toLocaleString('pt-br', {minimumFractionDigits: 2})}}</div>
+                                        <div><label>Código da Moeda da Transação Fraudulenta: </label>{{maisInformacoes.incomingItemTE40.cdMoedaTransFraudulenta}} - {{maisInformacoes.incomingItemTE40.mapDescricoesCodigos?.cdMoedaTransFraudulenta}}</div>
+                                        <div><label>Data de Notificação da Fraude: </label>{{maisInformacoes.incomingItemTE40.dtNotificacaoFraude | formatDateStr}}</div>
+                                        <div><label>Indicador de Origem da Autorização: </label>{{maisInformacoes.incomingItemTE40.indicadorOrigemAuth}} - {{maisInformacoes.incomingItemTE40.mapDescricoesCodigos?.indicadorOrigemAuth}}</div>
+                                        <div><label>Código da Notificação: </label>{{maisInformacoes.incomingItemTE40.cdNotificacao}}</div>
+                                        <div><label>Tipo de Fraude: </label>{{maisInformacoes.incomingItemTE40.tpFraude}} - {{maisInformacoes.incomingItemTE40.mapDescricoesCodigos?.tpFraude}}</div>
+                                        <div><label>Data de Vencimento do Cartão: </label>{{maisInformacoes.incomingItemTE40.dtVencCartao | formatDateStr}}</div>
+                                        <div><label>Tipo de Plataforma: </label>{{maisInformacoes.incomingItemTE40.tpPlataforma}} - {{maisInformacoes.incomingItemTE40.mapDescricoesCodigos?.tpPlataforma}}</div>
+                                        <div><label>Código da Bandeira: </label>{{maisInformacoes.incomingItemTE40.cdBandeira}} - {{maisInformacoes.incomingItemTE40.mapDescricoesCodigos?.cdBandeira}}</div>
+                                        <div><label>Banco Emissor: </label>{{maisInformacoes.incomingItemTE40.bancoEmissor}}</div>
+                                    </div>
+                                </mat-expansion-panel>
+                                <!-- Panel 1 - FIM -->
+
+                                <!-- Panel 2 - INICIO -->
+                                <mat-expansion-panel>
+                                    <mat-expansion-panel-header>
+                                        <mat-panel-title>Dados Adicionais de Fraude - "02"</mat-panel-title>
+                                    </mat-expansion-panel-header>
+                                    <div class="info">
+                                        <div><label>Código da Transação: </label>{{maisInformacoes.incomingItemTE40.cdTransacao02}} - {{maisInformacoes.incomingItemTE40.mapDescricoesCodigos?.cdTransacao02}}</div>
+                                        <div><label>Subcódigo da Transação: </label>{{maisInformacoes.incomingItemTE40.subCdTransacao02}}</div>
+                                        <div><label>Identificador da Transação: </label>{{maisInformacoes.incomingItemTE40.idTransacao}}</div>
+                                        <div><label>PV (Ponto de Venda): </label>{{maisInformacoes.incomingItemTE40.pontoVenda}}</div>
+                                        <div><label>Número Lógico do Equipamento: </label>{{maisInformacoes.incomingItemTE40.nrLogicoEquipamento}}</div>
+                                        <div><label>Indicador de Transação com Troco: </label>{{maisInformacoes.incomingItemTE40.indicadorTransTroca}}</div>
+                                        <div><label>Código de Autorização da Transação: </label>{{maisInformacoes.incomingItemTE40.cdAuthTransacao}}</div>
+                                        <div><label>Meio de Identificação do Portador: </label>{{maisInformacoes.incomingItemTE40.meioIdentPortador}} - {{maisInformacoes.incomingItemTE40.mapDescricoesCodigos?.meioIdentPortador}}</div>
+                                        <div><label>Modo de Entrada da Transação no POS: </label>{{maisInformacoes.incomingItemTE40.modoEntTransacaoPos}} - {{maisInformacoes.incomingItemTE40.mapDescricoesCodigos?.modoEntTransacaoPos}}</div>
+                                        <div><label>Identificação de Tecnologia do Terminal: </label>{{maisInformacoes.incomingItemTE40.identTecnologTerminal}} - {{maisInformacoes.incomingItemTE40.mapDescricoesCodigos?.identTecnologTerminal}}</div>
+                                        <div><label>Tecnologia do Cartão: </label>{{maisInformacoes.incomingItemTE40.tecnologiaCartao}}</div>
+                                        <div><label>Valor de Troco: </label>{{maisInformacoes.incomingItemTE40.vlTroco.toLocaleString('pt-br', {minimumFractionDigits: 2})}}</div>
+                                        <div><label>Indicador de Transação feita por corresp./Telefone ou comércio eletrônico.: </label>{{maisInformacoes.incomingItemTE40.indicTransFeitaPor}} - {{maisInformacoes.incomingItemTE40.mapDescricoesCodigos?.indicTransFeitaPor}}</div>
+                                        <div><label>CEP do Portador: </label>{{maisInformacoes.incomingItemTE40.cepPortador}}</div>
+                                        <div><label>Cidade do Portador: </label>{{maisInformacoes.incomingItemTE40.cidadePortador}}</div>
+                                        <div><label>UF do Portador: </label>{{maisInformacoes.incomingItemTE40.ufPortador}}</div>
+                                        <div><label>Data da Confirmação da Fraude: </label>{{maisInformacoes.incomingItemTE40.dtConfirmFraude | formatDateStr}}</div>
+                                        <div><label>Indicador de Liquidação: </label>{{maisInformacoes.incomingItemTE40.indicadorLiq}} - {{maisInformacoes.incomingItemTE40.mapDescricoesCodigos?.indicadorLiq}}</div>
+                                        <div><label>Nome do Portador: </label>{{maisInformacoes.incomingItemTE40.nmPortador}}</div>
+                                        <div><label>Token PAN: </label>{{maisInformacoes.incomingItemTE40.tokenPan}}</div>
+                                    </div>
+                                </mat-expansion-panel>
+                                <!-- Panel 2 - FIM -->
+                            </mat-accordion>
+                        </mat-tab>
+                    </mat-tab-group>
+                </div>
+            </mat-tab>
+        </mat-tab-group>
+    </div>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+    <div class="footer">
+        <button type="button" mat-raised-button color="accent" class="btn-right" (click)="fechar()">
+            <mat-icon>close</mat-icon>Fechar
+        </button>
+    </div>
+</mat-dialog-actions>    

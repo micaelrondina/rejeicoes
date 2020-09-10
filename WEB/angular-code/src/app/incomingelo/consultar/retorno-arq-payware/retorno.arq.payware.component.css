@@ -1,0 +1,10 @@
+.lbl-data {
+    float: left;
+    display: block;
+    margin-top: 20px;
+    margin-left: 15px;
+}
+
+.lbl-title {
+    margin-bottom: 10px;
+}

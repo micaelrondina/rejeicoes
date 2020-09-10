@@ -1,0 +1,37 @@
+.conteudo {
+    height: 94%;
+}
+.footer .btn-right {
+    float: right;
+}
+
+.tabela-historico {
+    width: 100%;
+}
+
+.info label { /*label dentro de uma classe info*/
+    font-weight: 600;
+}
+
+.info div {
+    margin-bottom: 3px;
+}
+
+.info-left {
+    width: 50%;
+    float: left;
+}
+
+.info-right {
+    width: 50%;
+    float: right;
+}
+
+.painel-expansivo mat-expansion-panel-header {
+    font-weight: 700;
+}
+
+.my-mat-dialog-content {
+    height: 94%;
+    max-height: none;
+}

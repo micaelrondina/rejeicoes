@@ -1,0 +1,36 @@
+.example-container {
+    height: 400px;
+    overflow: auto;
+}
+
+.tabela-padrao {
+    width: 100%;
+}
+
+.periodo-de {
+    float: left;
+    display: block;
+    margin-top: 20px;
+    margin-left: 15px;
+}
+
+.perido-a {
+    float: left;
+    display: block;
+    margin-top: 20px;
+}
+
+.mt10 {
+    margin-top: 10px;
+}
+
+.separa-grupos-colunas {
+    border-left-color: #e0e0e0;
+    border-left-width: 1px;
+    border-left-style: solid;
+    padding-left: 20px;
+}
+
+.lbl-rej-total {
+    color: red;
+}

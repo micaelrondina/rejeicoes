@@ -1,0 +1,14 @@
+        
+<!-- ============================================================== -->
+<!-- Profile - style you can find in header.scss -->
+<!-- ============================================================== -->
+<button [matMenuTriggerFor]="profile" mat-icon-button class="m-r-5" matTooltip="Usuário Logado" > 
+    <!--img src="assets/images/users/1.jpg" class="profile-pic"-->
+    {{ getLoginName()?.name }}
+</button>
+<mat-menu #profile="matMenu" class="mymegamenu">
+    <button mat-menu-item (click)="logoff()">
+        <mat-icon>exit_to_app</mat-icon> Sair
+    </button>
+</mat-menu>
+

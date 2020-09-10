@@ -1,0 +1,154 @@
+<div fxLayout="row" fxLayoutWrap="wrap">
+    <div fxFlex.gt-sm="100%" fxFlex="100" class="tela-filtro-grid-padrao">
+
+        <mat-card class="mat-card-filtro">
+            <mat-card-content>
+                <filtro-consulta [lblTitulo]="'Reenvio'" (changeSearch)="resetPesquisa()" (objectFiltro)="receberObjetoFiltro($event)"
+                    [tipoConsulta]="'analitica'" [outrosTotais]="'true'" [qtdTotal]="qtdTotal" [vlrTotal]="vlrTotal"
+                    [nomeFiltro]="nomeFiltro"  [valorLiq]="valorLiq" [qtdLiq]="qtdLiq" [qtdFiltro]="qtdFiltro" [vlrFiltro]="vlrFiltro" [opcFiltroSelect]="opcFiltroSelect"
+                    [exibirBtnExport]="exibirBtnExport" (onExport)="exportarGridExcel()"></filtro-consulta>
+            </mat-card-content>
+        </mat-card>
+
+        <!-- nao esta sendo usado  -->
+        <mat-card class="mat-card-grid-envio-rejeicoes">
+            <div class="filtro-status-trans">
+                <filtro-status-transacao [opcFiltroSelect]="opcFiltroSelect" [disabledFiltro]=disabledFiltro (changeFiltro)="changeOpcFiltroTransacao($event)"></filtro-status-transacao>
+            </div>
+            <div class="grid-container">
+                <table mat-table [dataSource]="dataSource" class="tabela-padrao" matSort (matSortChange)="sortData($event)" >
+                    <!-- Checkbox Column -->
+                    <ng-container matColumnDef="select">
+                        <th mat-header-cell *matHeaderCellDef style="min-width: 55px">
+                            <mat-checkbox #chkTodos disabled="true"
+                                        (change)="$event ? masterToggle() : null"
+                                        [checked]="selection.hasValue() && isAllSelected()"
+                                        [indeterminate]="selection.hasValue() && !isAllSelected() && isFiltroTodosOuPendentes()"
+                                        matTooltip="Marcar / Desmarcar todos" >
+                            </mat-checkbox>
+                        </th>
+                        <td mat-cell *matCellDef="let row">
+                            <mat-checkbox (click)="$event.stopPropagation()"
+                                        (change)="$event ? onCheckItem(row) : null"
+                                        [checked]="selection.isSelected(row) && row.dataLiberacao == null"
+                                        [disabled]=!row.podeMarcarParaReenviar
+                                        [matTooltip]="!row.podeMarcarParaReenviar ? 'Transação já Reenviada ou Cód. Erro B24' : null" >
+                            </mat-checkbox>
+                        </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="CODIGO_EC">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header style="min-width: 100px"> Cód. EC </th>
+                        <td mat-cell class="tabela-id" *matCellDef="let element"> {{element.codEC}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="NOME_EC">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header style="min-width: 210px"> Nome EC </th>
+                        <td mat-cell class="tabela-id" *matCellDef="let element"> {{element.nomeEC}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="CODIGO_PV">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header style="min-width: 80px"> Cód. PV </th>
+                        <td mat-cell class="tabela-id" *matCellDef="let element"> {{element.codPV}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="NOME_PV">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header style="min-width: 210px"> Nome PV </th>
+                        <td mat-cell class="tabela-id" *matCellDef="let element"> {{element.nomePVBanco}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="CIDADE_PV">
+                        <th mat-header-cell *matHeaderCellDef style="min-width: 130px"> Cidade PV </th>
+                        <td mat-cell *matCellDef="let element"> {{element.cidadePV}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="DATA_MOV">
+                        <th mat-header-cell *matHeaderCellDef style="min-width: 90px"> Mov. </th>
+                        <td mat-cell *matCellDef="let element"> {{element.dataMovFormatada}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="VALOR_VENDA">
+                        <th mat-header-cell *matHeaderCellDef style="min-width: 70px; text-align: right; padding-right: 10px;"> Valor <br /> Venda </th>
+                        <td mat-cell *matCellDef="let element" style="text-align: right; padding-right: 10px;">{{element.valorVenda.toLocaleString('pt-br', {minimumFractionDigits: 2})}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="PARCELAS">
+                        <th mat-header-cell *matHeaderCellDef style="min-width: 80px"> Parcelas </th>
+                        <td mat-cell *matCellDef="let element"> {{element.numParcela}}/{{element.qtdTotParcelas}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="QTD_DIAS_LIQ_FINAN_TRANS">
+                        <th mat-header-cell *matHeaderCellDef style="min-width: 70px"> Dias Liq. <br /> Fin. Trans.</th>
+                        <td mat-cell *matCellDef="let element"> {{element.qtdDiasLiqFinanTransacao}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="NUM_REF_TRANS">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header style="min-width: 200px"> Nº Ref. Transação </th>
+                        <td mat-cell *matCellDef="let element"> {{element.numRefTransacao}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="COD_AUTH_TRANS">
+                        <th mat-header-cell *matHeaderCellDef style="min-width: 80px"> Cód. Auth. Transação </th>
+                        <td mat-cell *matCellDef="let element"> {{element.codAuthTransacao}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="QTD_VZ_TRANS_REJ">
+                        <th mat-header-cell *matHeaderCellDef style="min-width: 80px"> Qtd. Vezes. <br /> Trans. Rej. </th>
+                        <td mat-cell *matCellDef="let element"> {{element.qtdVezesTransRej}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="COD_ERRO">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header style="min-width: 40px"> Cód. Erro </th>
+                        <td mat-cell *matCellDef="let element"> {{element.codErro}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="DESC_MSG_ERRO">
+                        <th mat-header-cell *matHeaderCellDef style="min-width: 600px"> Descrição Mensagem Erro </th>
+                        <td mat-cell *matCellDef="let element"> {{element.descMsgErro}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="NUM_LOTE">
+                        <th mat-header-cell *matHeaderCellDef style="min-width: 50px"> Nº Lote </th>
+                        <td mat-cell *matCellDef="let element"> {{element.numLote}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="LOGIN_LIBERACAO">
+                        <th mat-header-cell *matHeaderCellDef style="min-width: 80px"> Usuário Reenvio </th>
+                        <td mat-cell *matCellDef="let element"> {{element.loginLiberacao}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="DATA_LIBERACAO">
+                        <th mat-header-cell *matHeaderCellDef style="min-width: 100px"> Data <br /> Reenvio </th>
+                        <td mat-cell *matCellDef="let element"> {{element.dataLiberacao | date:'dd/MM/yyyy'}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="LOGIN_ACATADO">
+                        <th mat-header-cell *matHeaderCellDef style="min-width: 80px"> Usuário Acatado </th>
+                        <td mat-cell *matCellDef="let element"> {{element.loginAcatado}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="DATA_ACATADO">
+                        <th mat-header-cell *matHeaderCellDef style="min-width: 100px"> Data <br /> Acatado </th>
+                        <td mat-cell *matCellDef="let element"> {{element.dataAcatado | date:'dd/MM/yyyy'}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="LOGIN_REJEICAO">
+                        <th mat-header-cell *matHeaderCellDef style="min-width: 80px"> Usuário Rejeição </th>
+                        <td mat-cell *matCellDef="let element"> {{element.loginRejeicao}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="DATA_REJEICAO">
+                        <th mat-header-cell *matHeaderCellDef style="min-width: 100px"> Data <br /> Rejeição </th>
+                        <td mat-cell *matCellDef="let element"> {{element.dataRejeicao | date:'dd/MM/yyyy'}} </td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="consultarMaisInformacoes(row.id.idMatriz, row.id.idItem, row.numRefTransacao, row.numParcela, row.idTpTrans)" ></tr>
+                </table>
+            </div>
+        </mat-card>
+        <div class="posicao-btn-enviar">
+            <button class="mtb10" type="button" mat-raised-button color="primary" (click)="enviar()">Enviar</button>
+        </div>
+    </div>
+</div>

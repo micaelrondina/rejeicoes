@@ -1,0 +1,6 @@
+<span>Filtrar Transações: </span>
+<mat-radio-group [(ngModel)]="opcFiltroSelect" (change)="changeOpcFiltroTransacao()" [disabled]="disabledFiltro" >
+    <mat-radio-button class="filtro-status-trans-item" *ngFor="let opcao of opcoesFiltroTrans" [value]="opcao.id">
+        {{opcao.label}}
+    </mat-radio-button>
+</mat-radio-group>
